@@ -17,6 +17,9 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  // Relative base so the build works under the GitHub Pages project subpath
+  // (https://kaidena9.github.io/dva-contracting/) as well as at a domain root.
+  base: './',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
