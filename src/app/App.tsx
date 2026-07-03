@@ -786,47 +786,47 @@ export default function App() {
         </a>
       </section>
 
-      {/* ── Gallery: the spinning sphere alone on one screen, stats anchoring it ── */}
+      {/* ── Gallery: stats rail on the left, the spinning sphere alone on the right ── */}
       <section
         id="gallery"
-        className="lg:h-screen flex flex-col justify-between px-8 pt-20 pb-8"
+        className="lg:h-screen flex flex-col px-8 pt-24 pb-10"
         style={{ background: "#FFFFFF", borderBottom: `1px solid ${LINE}`, scrollMarginTop: 0 }}
       >
-        <Reveal>
-          <div className="text-center">
-            <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
-              The Portfolio, In Motion
-            </p>
-            <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2rem,3.6vw,2.9rem)", color: INK, lineHeight: 1.05 }}>
-              Take a spin through <em style={{ fontStyle: "italic", fontWeight: 400, color: BLUE }}>the work.</em>
-            </h2>
-          </div>
-        </Reveal>
-
-        <div className="flex-1 flex items-center justify-center py-4">
-          {/* scales down by width AND by available height so the whole section fits one screen */}
-          <div style={{ transform: `scale(min(1, calc((min(100vw, 560px) - 2rem) / 520px), calc((100vh - 430px) / 480)))`, transformOrigin: "center center" }}>
-            <Sphere3D onSelect={openProject} />
-          </div>
-        </div>
-
-        <div className="max-w-5xl mx-auto w-full pt-8" style={{ borderTop: `1px solid ${LINE}` }}>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {STATS.map((s, i) => (
-              <Reveal key={s.label} delay={i * 0.07}>
-                <div className="text-center relative">
-                  {i > 0 && (
-                    <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-10 w-px" style={{ background: LINE }} />
-                  )}
-                  <div className="leading-none mb-2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.8rem,3.2vw,2.5rem)", color: BLUE_DARK }}>
-                    {s.value}
+        <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16 min-h-0">
+          {/* Left rail: heading + honest numbers, horizontal hairlines only */}
+          <div className="w-full lg:w-[320px] shrink-0">
+            <Reveal>
+              <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
+                The Portfolio, In Motion
+              </p>
+              <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.9rem,2.6vw,2.5rem)", color: INK, lineHeight: 1.08 }}>
+                Take a spin through <em style={{ fontStyle: "italic", fontWeight: 400, color: BLUE }}>the work.</em>
+              </h2>
+            </Reveal>
+            <div className="mt-8 lg:mt-10 grid grid-cols-2 lg:grid-cols-1 gap-x-8">
+              {STATS.map((s, i) => (
+                <Reveal key={s.label} delay={i * 0.07}>
+                  <div className="py-4 lg:py-5" style={{ borderTop: `1px solid ${LINE}` }}>
+                    <div className="leading-none mb-1.5" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.7rem,2.4vw,2.2rem)", color: BLUE_DARK }}>
+                      {s.value}
+                    </div>
+                    <div style={{ fontFamily: SANS, fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 500, color: INK2, lineHeight: 1.5 }}>
+                      {s.label}
+                    </div>
                   </div>
-                  <div style={{ fontFamily: SANS, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: INK2 }}>
-                    {s.label}
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              ))}
+            </div>
+          </div>
+
+          {/* Sphere: alone on the right, scales by remaining width AND height */}
+          <div className="flex-1 flex items-center justify-center min-h-[420px] lg:min-h-0 overflow-hidden">
+            <div
+              className="[--fitw:calc((min(100vw,560px)-4rem)/580)] [--fith:1] lg:[--fitw:calc((100vw-480px)/520)] lg:[--fith:calc((100vh-200px)/480)]"
+              style={{ transform: "scale(min(1, var(--fitw), var(--fith)))", transformOrigin: "center center" }}
+            >
+              <Sphere3D onSelect={openProject} />
+            </div>
           </div>
         </div>
       </section>
