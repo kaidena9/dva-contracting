@@ -878,15 +878,22 @@ export default function App() {
               </p>
             </div>
           </Reveal>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-            {PROJECTS.map((p, i) => (
+          {/* Interlocking mosaic: three 2x2 feature tiles + 1x1 squares tile a perfect 4x6 rectangle */}
+          <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense gap-2.5">
+            {PROJECTS.map((p, i) => {
+              const featured = i === 0 || i === 5 || i === 10;
+              return (
               <div
                 key={p.id}
-                className="group relative overflow-hidden cursor-pointer"
-                style={{ aspectRatio: i === 0 || i === 5 ? "1/1.3" : "1/1", background: "#DCE4F5", borderRadius: 4 }}
+                className={`group relative overflow-hidden cursor-pointer ${
+                  featured ? "md:col-span-2 md:row-span-2" : ""
+                } ${i === 5 ? "md:col-start-3" : ""} ${
+                  i === 0 ? "col-span-2 aspect-[16/10] md:aspect-auto" : featured ? "aspect-square md:aspect-auto" : "aspect-square"
+                }`}
+                style={{ background: "#DCE4F5", borderRadius: 4 }}
                 onClick={() => setSelectedIdx(i)}
               >
-                <img src={p.thumb} alt={p.label} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={featured ? p.full : p.thumb} alt={p.label} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
                   style={{ background: "linear-gradient(to top, rgba(8,15,50,0.88) 0%, rgba(8,15,50,0.1) 60%, transparent 100%)" }}
@@ -896,7 +903,8 @@ export default function App() {
                 </div>
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ border: "1.5px solid rgba(96,165,250,0.55)", borderRadius: 4 }} />
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
