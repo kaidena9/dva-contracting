@@ -1,6 +1,25 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import { X, Phone, Mail, MapPin, Menu, ArrowRight, ChevronDown } from "lucide-react";
 
+// Public-folder assets, resolved against the Vite base so the build works
+// both at the GitHub Pages subpath and at a custom domain root.
+const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
+
+// ─── Refined Navy theme ───────────────────────────────────────────────────────
+const SERIF = "'Fraunces', Georgia, serif"; // display face
+const SANS = "'DM Sans', sans-serif";
+const STONE = "#F0F4FF";       // alternate section background (blue tint)
+const INK = "#0C1A3F";         // headings on light sections
+const INK2 = "#46536B";        // body text
+const INK3 = "#8792A6";        // captions
+const BLUE = "#2563EB";        // accent / CTA
+const BLUE_DARK = "#1D4ED8";   // accent hover
+const SKY = "#60A5FA";         // accent on dark
+const SKY_SOFT = "#93C5FD";    // soft accent on dark
+const DARK = "#0C1A3F";        // contact section
+const DARKER = "#080F28";      // footer
+const LINE = "rgba(37,99,235,0.14)";
+
 // ─── Sphere physics constants ─────────────────────────────────────────────────
 const SPHERE_R = 210;
 const PERSPECTIVE = 650;
@@ -28,66 +47,124 @@ interface Project {
   full: string;
   label: string;
   category: string;
-  year: string;
 }
 
+// All photos below are real DVA Contracting projects supplied by the owner.
 const PROJECTS: Project[] = [
-  { id: 1, thumb: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&h=1000&fit=crop&auto=format", label: "Foundation Work",    category: "Structural",  year: "2024" },
-  { id: 2, thumb: "https://images.unsplash.com/photo-1599707254554-027aeb4deacd?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1599707254554-027aeb4deacd?w=1600&h=1000&fit=crop&auto=format", label: "Crane Operations",   category: "Heavy Civil", year: "2024" },
-  { id: 3, thumb: "https://images.unsplash.com/photo-1694521787162-5373b598945c?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1694521787162-5373b598945c?w=1600&h=1000&fit=crop&auto=format", label: "Site Management",   category: "Operations",  year: "2023" },
-  { id: 4, thumb: "https://images.unsplash.com/photo-1527335988388-b40ee248d80c?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1527335988388-b40ee248d80c?w=1600&h=1000&fit=crop&auto=format", label: "Steel Framing",     category: "Structural",  year: "2023" },
-  { id: 5, thumb: "https://images.unsplash.com/photo-1609867271967-a82f85c48531?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1609867271967-a82f85c48531?w=1600&h=1000&fit=crop&auto=format", label: "High-Rise Build",   category: "Commercial",  year: "2023" },
-  { id: 6, thumb: "https://images.unsplash.com/photo-1718816281270-ed6ef8357859?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1718816281270-ed6ef8357859?w=1600&h=1000&fit=crop&auto=format", label: "Interior Fit-Out",  category: "Renovation",  year: "2024" },
-  { id: 7, thumb: "https://images.unsplash.com/photo-1731168273756-e02cae42265b?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1731168273756-e02cae42265b?w=1600&h=1000&fit=crop&auto=format", label: "Finish Carpentry",  category: "Renovation",  year: "2024" },
-  { id: 8, thumb: "https://images.unsplash.com/photo-1694521787673-28cbd8830ea5?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1694521787673-28cbd8830ea5?w=1600&h=1000&fit=crop&auto=format", label: "Field Crew",        category: "Operations",  year: "2023" },
-  { id: 9, thumb: "https://images.unsplash.com/photo-1602757115429-b4190ae087be?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1602757115429-b4190ae087be?w=1600&h=1000&fit=crop&auto=format", label: "Concrete Pour",    category: "Structural",  year: "2024" },
-  { id: 10,thumb: "https://images.unsplash.com/photo-1698889670677-caac664cfce0?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1698889670677-caac664cfce0?w=1600&h=1000&fit=crop&auto=format", label: "Shell Structure",  category: "Commercial",  year: "2023" },
-  { id: 11,thumb: "https://images.unsplash.com/photo-1692890659047-079b769ee3e6?w=400&h=400&fit=crop&auto=format", full: "https://images.unsplash.com/photo-1692890659047-079b769ee3e6?w=1600&h=1000&fit=crop&auto=format", label: "Site Prep",        category: "Structural",  year: "2024" },
+  { id: 1,  thumb: asset("projects/kitchen-coffered-sq.jpg"),    full: asset("projects/kitchen-coffered.jpg"),    label: "Full Kitchen Remodel",     category: "Kitchens" },
+  { id: 2,  thumb: asset("projects/framing-aerial-sq.jpg"),      full: asset("projects/framing-aerial.jpg"),      label: "Roof Framing",             category: "New Construction" },
+  { id: 3,  thumb: asset("projects/home-bar-sq.jpg"),            full: asset("projects/home-bar.jpg"),            label: "Custom Home Bar",          category: "Basements" },
+  { id: 4,  thumb: asset("projects/bathroom-subway-sq.jpg"),     full: asset("projects/bathroom-subway.jpg"),     label: "Bathroom Remodel",         category: "Bathrooms" },
+  { id: 5,  thumb: asset("projects/deck-railing-sq.jpg"),        full: asset("projects/deck-railing.jpg"),        label: "Deck & Aluminum Railings", category: "Decks & Outdoor" },
+  { id: 6,  thumb: asset("projects/kitchen-marble-sq.jpg"),      full: asset("projects/kitchen-marble.jpg"),      label: "Marble Island Kitchen",    category: "Kitchens" },
+  { id: 7,  thumb: asset("projects/basement-rec-sq.jpg"),        full: asset("projects/basement-rec.jpg"),        label: "Basement Rec Room",        category: "Basements" },
+  { id: 8,  thumb: asset("projects/newbuild-sunset-sq.jpg"),     full: asset("projects/newbuild-sunset.jpg"),     label: "New Home Build",           category: "New Construction" },
+  { id: 9,  thumb: asset("projects/kitchen-pantry-sq.jpg"),      full: asset("projects/kitchen-pantry.jpg"),      label: "Kitchen & Coffee Bar",     category: "Kitchens" },
+  { id: 10, thumb: asset("projects/addition-tyvek-sq.jpg"),      full: asset("projects/addition-tyvek.jpg"),      label: "Second-Story Addition",    category: "Additions" },
+  { id: 11, thumb: asset("projects/basement-gray-sq.jpg"),       full: asset("projects/basement-gray.jpg"),       label: "Finished Basement",        category: "Basements" },
+  { id: 12, thumb: asset("projects/kitchen-dark-island-sq.jpg"), full: asset("projects/kitchen-dark-island.jpg"), label: "Kitchen Remodel",          category: "Kitchens" },
+  { id: 13, thumb: asset("projects/living-accent-sq.jpg"),       full: asset("projects/living-accent.jpg"),       label: "Living Room Remodel",      category: "Interiors" },
+  { id: 14, thumb: asset("projects/pool-deck-sq.jpg"),           full: asset("projects/pool-deck.jpg"),           label: "Pool Deck",                category: "Decks & Outdoor" },
+  { id: 15, thumb: asset("projects/kitchen-marble-wide-sq.jpg"), full: asset("projects/kitchen-marble-wide.jpg"), label: "Kitchen Remodel",          category: "Kitchens" },
 ];
 
 const SERVICES = [
   {
     num: "01",
-    title: "General Contracting",
-    tagline: "End-to-end project delivery",
-    desc: "Full-scope management from groundbreaking through final inspection. We self-perform critical path work and hold every subcontractor to our standard.",
-    img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=700&h=900&fit=crop&auto=format",
+    title: "Kitchens & Bathrooms",
+    tagline: "The rooms that sell homes",
+    desc: "Full gut renovations: cabinetry, tile, counters, plumbing, and lighting. Designed with you, built by crews Dave trusts, and finished to the punch list.",
+    img: asset("projects/kitchen-coffered.jpg"),
   },
   {
     num: "02",
-    title: "Renovations & Fit-Out",
-    tagline: "Precision with minimal disruption",
-    desc: "Commercial and residential renovations delivered on time, with meticulous attention to finishes and active-occupancy sequencing.",
-    img: "https://images.unsplash.com/photo-1718816281270-ed6ef8357859?w=700&h=900&fit=crop&auto=format",
+    title: "Basements & Interiors",
+    tagline: "Found space, done right",
+    desc: "Finished basements, home bars, rec rooms, and whole-room remodels that make the square footage you already own actually work for you.",
+    img: asset("projects/home-bar.jpg"),
   },
   {
     num: "03",
-    title: "Design-Build",
-    tagline: "One team, one vision",
-    desc: "Integrated design and construction services that compress schedules, reduce change orders, and deliver a single point of accountability.",
-    img: "https://images.unsplash.com/photo-1527335988388-b40ee248d80c?w=700&h=900&fit=crop&auto=format",
+    title: "Additions & New Builds",
+    tagline: "Foundation to framing to finish",
+    desc: "Second-story additions, ground-up construction, decks, and structural work. Residential and commercial, managed by the owner the whole way.",
+    img: asset("projects/newbuild-sunset.jpg"),
   },
 ];
 
+/* Honest numbers only. [VERIFY with Dave: free estimates offered? licensed/insured wording] */
 const STATS = [
-  { value: "150+", label: "Projects Completed" },
-  { value: "22",   label: "Years in Business"  },
-  { value: "$480M",label: "Project Value"       },
-  { value: "98%",  label: "Client Satisfaction" },
+  { value: "15+",   label: "Years in Business" },
+  { value: "1",     label: "Owner on Every Job" },
+  { value: "2 hrs", label: "Service Radius · Bartlett, IL" },
+  { value: "Free",  label: "Estimates & Consultations" },
 ];
+
+const PHONE_DISPLAY = "630-886-8628";
+const PHONE_TEL = "tel:+16308868628";
+const EMAIL = "info@dvacontractinginc.com";
+
+// ─── Scroll reveal ────────────────────────────────────────────────────────────
+
+function useInView(threshold = 0) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [threshold]);
+  return { ref, inView };
+}
+
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "none" : "translateY(26px)",
+        transition: `opacity .8s cubic-bezier(.22,.61,.27,1) ${delay}s, transform .8s cubic-bezier(.22,.61,.27,1) ${delay}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 // ─── 3D Sphere Carousel ───────────────────────────────────────────────────────
 
 function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
   const containerRef  = useRef<HTMLDivElement>(null);
-  const imgRefs       = useRef<(HTMLDivElement | null)[]>(new Array(PROJECTS.length).fill(null));
+  const sphereProjects = PROJECTS.slice(0, SPHERE_CONFIG.length);
+  const imgRefs       = useRef<(HTMLDivElement | null)[]>(new Array(SPHERE_CONFIG.length).fill(null));
   const angleRef      = useRef(0);
   const velRef        = useRef(BASE_SPEED);
   const dragging      = useRef(false);
   const prevX         = useRef(0);
   const totalDragRef  = useRef(0);
   const rafId         = useRef(0);
+  const visibleRef    = useRef(true);
   const [grabbing, setGrabbing] = useState(false);
+
+  const reduce = typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const idleSpeed = reduce ? 0 : BASE_SPEED;
 
   // Pre-compute fixed sphere positions in radians
   const positions = SPHERE_CONFIG.map((c) => ({
@@ -100,12 +177,18 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
     let last = performance.now();
 
     const tick = (now: number) => {
+      // battery: skip all work while the gallery is offscreen
+      if (!visibleRef.current) {
+        last = now;
+        rafId.current = requestAnimationFrame(tick);
+        return;
+      }
       const dt = Math.min((now - last) / 16.67, 3);
       last = now;
 
       if (!dragging.current) {
         velRef.current *= Math.pow(FRICTION, dt);
-        if (Math.abs(velRef.current) < BASE_SPEED) velRef.current = BASE_SPEED;
+        if (Math.abs(velRef.current) < idleSpeed) velRef.current = idleSpeed;
         angleRef.current += velRef.current * dt;
       }
 
@@ -118,7 +201,7 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
         // Spherical → cartesian (y-up, z-toward viewer)
         const cosEl = Math.cos(pos.el);
         const x3d   =  SPHERE_R * cosEl * Math.sin(effectiveAz);
-        const y3d   = -SPHERE_R * Math.sin(pos.el);        // negative = up in CSS
+        const y3d   = -SPHERE_R * Math.sin(pos.el);
         const z3d   =  SPHERE_R * cosEl * Math.cos(effectiveAz);
 
         // Perspective projection
@@ -128,7 +211,7 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
         const y2d    = y3d * scale;
 
         const sz     = pos.size * scale;
-        const opacity= Math.min(1, Math.max(0.12, (z3d + SPHERE_R) / (2 * SPHERE_R)));
+        const opacity= Math.min(1, Math.max(0.14, (z3d + SPHERE_R) / (2 * SPHERE_R)));
         const zIdx   = Math.round(scale * 1000);
 
         el.style.width         = `${sz}px`;
@@ -146,6 +229,15 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
     return () => cancelAnimationFrame(rafId.current);
   }, []);
 
+  // pause the loop entirely while scrolled past
+  useEffect(() => {
+    const wrap = containerRef.current;
+    if (!wrap || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver((en) => { visibleRef.current = en[0].isIntersecting; });
+    io.observe(wrap);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return;
@@ -159,7 +251,7 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
       if (!dragging.current) return;
       dragging.current = false;
       setGrabbing(false);
-      if (Math.abs(velRef.current) < 0.003) velRef.current = BASE_SPEED;
+      if (Math.abs(velRef.current) < 0.003) velRef.current = idleSpeed;
     };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
@@ -188,7 +280,7 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
         e.preventDefault();
       } else if (e.type === "touchend") {
         dragging.current = false;
-        if (Math.abs(velRef.current) < 0.003) velRef.current = BASE_SPEED;
+        if (Math.abs(velRef.current) < 0.003) velRef.current = idleSpeed;
       }
     };
     wrap.addEventListener("touchstart", onTouch, { passive: false });
@@ -231,12 +323,12 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
           left: "50%",
           top: "50%",
           transform: "translate(-50%,-50%)",
-          border: "1px solid rgba(96,165,250,0.12)",
+          border: "1px solid rgba(37,99,235,0.16)",
         }}
       />
 
       {/* Images */}
-      {PROJECTS.map((proj, i) => (
+      {sphereProjects.map((proj, i) => (
         <div
           key={proj.id}
           ref={(el) => { imgRefs.current[i] = el; }}
@@ -252,8 +344,8 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
           <div
             className="group relative w-full h-full rounded-xl overflow-hidden"
             style={{
-              border: "2px solid rgba(255,255,255,0.22)",
-              boxShadow: "0 12px 48px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)",
+              border: "2px solid #FFFFFF",
+              boxShadow: "0 18px 44px rgba(12,26,63,0.22), 0 3px 10px rgba(12,26,63,0.12)",
               cursor: grabbing ? "grabbing" : "pointer",
             }}
           >
@@ -267,15 +359,16 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
             <div
               className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300"
               style={{
-                background: "rgba(37,99,235,0.22)",
-                border: "2px solid rgba(147,197,253,0.7)",
+                background: "rgba(37,99,235,0.2)",
+                border: "2px solid rgba(147,197,253,0.8)",
               }}
             />
             {/* Label on hover */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-blue-950/90 to-transparent p-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-x-0 bottom-0 p-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{ background: "linear-gradient(to top, rgba(12,26,63,0.9), transparent)" }}>
               <p
-                className="text-white font-bold uppercase leading-tight"
-                style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: "0.06em" }}
+                className="text-white leading-tight"
+                style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.02em" }}
               >
                 {proj.label}
               </p>
@@ -291,14 +384,14 @@ function Sphere3D({ onSelect }: { onSelect: (p: Project) => void }) {
           bottom: 0,
           left: "50%",
           transform: "translateX(-50%)",
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: 9,
-          letterSpacing: "0.22em",
+          fontFamily: SANS,
+          fontSize: 10,
+          letterSpacing: "0.2em",
           textTransform: "uppercase",
-          color: "rgba(148,163,184,0.5)",
+          color: INK3,
         }}
       >
-        drag to spin · click to expand
+        drag to spin · click any photo
       </p>
     </div>
   );
@@ -337,28 +430,31 @@ function Lightbox({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(8,15,40,0.97)", backdropFilter: "blur(14px)" }}
+      style={{ background: "rgba(8,15,40,0.96)", backdropFilter: "blur(14px)" }}
       onClick={onClose}
     >
       <button
+        aria-label="Close"
         className="absolute top-6 right-6 flex items-center justify-center w-10 h-10 rounded-full transition-all hover:bg-white/10"
-        style={{ border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.6)" }}
+        style={{ border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.65)" }}
         onClick={onClose}
       >
         <X size={18} />
       </button>
 
       <button
+        aria-label="Previous project"
         className="absolute left-4 md:left-8 flex items-center justify-center w-10 h-10 rounded-full transition-all hover:bg-blue-500/20"
-        style={{ border: "1px solid rgba(96,165,250,0.25)", color: "rgba(147,197,253,0.7)" }}
+        style={{ border: "1px solid rgba(96,165,250,0.3)", color: "rgba(147,197,253,0.75)" }}
         onClick={(e) => { e.stopPropagation(); onPrev(); }}
       >
         <ArrowRight size={18} className="rotate-180" />
       </button>
 
       <button
+        aria-label="Next project"
         className="absolute right-4 md:right-8 flex items-center justify-center w-10 h-10 rounded-full transition-all hover:bg-blue-500/20"
-        style={{ border: "1px solid rgba(96,165,250,0.25)", color: "rgba(147,197,253,0.7)" }}
+        style={{ border: "1px solid rgba(96,165,250,0.3)", color: "rgba(147,197,253,0.75)" }}
         onClick={(e) => { e.stopPropagation(); onNext(); }}
       >
         <ArrowRight size={18} />
@@ -368,26 +464,26 @@ function Lightbox({
         className="relative mx-16 md:mx-24 w-full max-w-5xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden rounded-sm" style={{ background: "#0C1A3F" }}>
+        <div className="relative overflow-hidden rounded-sm" style={{ background: "#0A1330" }}>
           <img
             src={project.full}
             alt={project.label}
-            className="w-full object-cover"
-            style={{ maxHeight: "72vh" }}
+            className="w-full object-contain"
+            style={{ maxHeight: "72vh", background: "#0A1330" }}
           />
           <div
             className="absolute bottom-0 left-0 right-0 px-6 py-5 flex items-end justify-between"
             style={{ background: "linear-gradient(to top, rgba(8,15,40,0.92) 0%, transparent 100%)" }}
           >
             <div>
-              <p className="text-blue-400 mb-1" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+              <p className="mb-1" style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: SKY }}>
                 {project.category}
               </p>
-              <h2 className="text-white font-black uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.8rem,4vw,3rem)", lineHeight: 0.95 }}>
+              <h2 className="text-white" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.6rem,3.4vw,2.6rem)", lineHeight: 1.05 }}>
                 {project.label}
               </h2>
             </div>
-            <span className="text-white/35" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 300 }}>{project.year}</span>
+            <span className="text-white/50" style={{ fontFamily: SANS, fontSize: 12, fontWeight: 400, letterSpacing: "0.06em" }}>DVA Contracting</span>
           </div>
         </div>
 
@@ -397,7 +493,7 @@ function Lightbox({
               key={p.id}
               className="flex-shrink-0 w-14 h-10 rounded overflow-hidden transition-all"
               style={{
-                border: p.id === project.id ? "1.5px solid #3B82F6" : "1.5px solid rgba(255,255,255,0.08)",
+                border: p.id === project.id ? "1.5px solid #3B82F6" : "1.5px solid rgba(255,255,255,0.1)",
                 opacity: p.id === project.id ? 1 : 0.45,
               }}
             >
@@ -412,12 +508,12 @@ function Lightbox({
 
 // ─── Service Card ─────────────────────────────────────────────────────────────
 
-function ServiceCard({ s, idx }: { s: (typeof SERVICES)[number]; idx: number }) {
+function ServiceCard({ s }: { s: (typeof SERVICES)[number] }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
       className="relative overflow-hidden cursor-pointer"
-      style={{ aspectRatio: "3/4", borderRadius: 4, background: "#0C1A3F" }}
+      style={{ aspectRatio: "3/4", borderRadius: 5, background: DARK }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -434,8 +530,8 @@ function ServiceCard({ s, idx }: { s: (typeof SERVICES)[number]; idx: number }) 
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
-          background: "linear-gradient(to top, rgba(8,15,50,0.97) 0%, rgba(8,15,50,0.65) 45%, rgba(8,15,50,0.28) 100%)",
-          opacity: hovered ? 0.88 : 1,
+          background: "linear-gradient(to top, rgba(8,15,50,0.96) 0%, rgba(8,15,50,0.6) 45%, rgba(8,15,50,0.22) 100%)",
+          opacity: hovered ? 0.9 : 1,
         }}
       />
 
@@ -443,11 +539,13 @@ function ServiceCard({ s, idx }: { s: (typeof SERVICES)[number]; idx: number }) 
       <div className="absolute inset-0 flex flex-col justify-end p-7">
         {/* Number */}
         <p
-          className="font-black leading-none mb-4 transition-colors duration-300"
+          className="leading-none mb-4 transition-colors duration-300"
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: "4.5rem",
-            color: hovered ? "rgba(96,165,250,0.5)" : "rgba(255,255,255,0.1)",
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontWeight: 400,
+            fontSize: "3.4rem",
+            color: hovered ? "rgba(147,197,253,0.75)" : "rgba(255,255,255,0.2)",
             lineHeight: 1,
           }}
         >
@@ -457,20 +555,20 @@ function ServiceCard({ s, idx }: { s: (typeof SERVICES)[number]; idx: number }) 
         <p
           className="mb-2 transition-colors duration-300"
           style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: SANS,
             fontSize: 10,
             fontWeight: 600,
             letterSpacing: "0.2em",
             textTransform: "uppercase",
-            color: hovered ? "#93C5FD" : "rgba(147,197,253,0.5)",
+            color: hovered ? SKY_SOFT : "rgba(147,197,253,0.6)",
           }}
         >
           {s.tagline}
         </p>
 
         <h3
-          className="text-white font-black uppercase mb-4"
-          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(1.5rem,2.5vw,2rem)", lineHeight: 0.95 }}
+          className="text-white mb-4"
+          style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.4rem,2.3vw,1.8rem)", lineHeight: 1.08 }}
         >
           {s.title}
         </h3>
@@ -478,38 +576,39 @@ function ServiceCard({ s, idx }: { s: (typeof SERVICES)[number]; idx: number }) 
         {/* Description — slides in on hover */}
         <div
           className="overflow-hidden transition-all duration-500"
-          style={{ maxHeight: hovered ? "120px" : "0px", opacity: hovered ? 1 : 0 }}
+          style={{ maxHeight: hovered ? "150px" : "0px", opacity: hovered ? 1 : 0 }}
         >
-          <p className="text-white/60 text-sm leading-relaxed mb-5" style={{ fontWeight: 300 }}>
+          <p className="text-white/75 text-sm leading-relaxed mb-5" style={{ fontFamily: SANS, fontWeight: 300 }}>
             {s.desc}
           </p>
-          <div
-            className="flex items-center gap-2 font-semibold uppercase transition-all duration-300"
-            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "0.9rem", letterSpacing: "0.1em", color: "#60A5FA" }}
+          <a
+            href="#contact"
+            className="flex items-center gap-2 transition-all duration-300"
+            style={{ fontFamily: SANS, fontWeight: 600, fontSize: "0.8rem", letterSpacing: "0.08em", textTransform: "uppercase", color: SKY }}
           >
-            Learn more <ArrowRight size={14} />
-          </div>
+            Get an estimate <ArrowRight size={14} />
+          </a>
         </div>
 
-        {/* Collapsed "learn more" hint */}
+        {/* Collapsed hint */}
         {!hovered && (
           <div
             className="flex items-center gap-1.5"
-            style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: "0.1em", color: "rgba(96,165,250,0.5)" }}
+            style={{ fontFamily: SANS, fontSize: 11, letterSpacing: "0.1em", color: "rgba(147,197,253,0.6)" }}
           >
-            <span className="w-6 h-px bg-blue-400/40" />
+            <span className="w-6 h-px" style={{ background: "rgba(96,165,250,0.5)" }} />
             <span className="uppercase font-medium">Explore</span>
           </div>
         )}
       </div>
 
-      {/* Blue glow border on hover */}
+      {/* Blue border on hover */}
       <div
-        className="absolute inset-0 rounded transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
         style={{
-          border: "1.5px solid rgba(96,165,250,0.55)",
+          border: "1.5px solid rgba(96,165,250,0.6)",
           opacity: hovered ? 1 : 0,
-          borderRadius: 4,
+          borderRadius: 5,
         }}
       />
     </div>
@@ -527,195 +626,275 @@ export default function App() {
   const goPrev          = useCallback(() => setSelectedIdx((i) => (i === null ? 0 : (i - 1 + PROJECTS.length) % PROJECTS.length)), []);
   const goNext          = useCallback(() => setSelectedIdx((i) => (i === null ? 0 : (i + 1) % PROJECTS.length)), []);
 
+  // Contact form composes an email in the visitor's mail app — no backend needed.
+  const submitForm = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const name = fd.get("name") || "";
+    const phone = fd.get("phone") || "";
+    const from = fd.get("email") || "";
+    const msg = fd.get("message") || "";
+    const subject = encodeURIComponent(`Project inquiry from ${name || "the website"}`);
+    const body = encodeURIComponent(`Name: ${name}\nPhone: ${phone}\nEmail: ${from}\n\nProject:\n${msg}`);
+    window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+  }, []);
+
+  const inputStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(96,165,250,0.2)",
+    fontFamily: SANS,
+    fontWeight: 300,
+  };
+
   return (
-    <div className="bg-background text-foreground min-h-screen" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <div className="min-h-screen" style={{ fontFamily: SANS, background: "#FFFFFF", color: INK }}>
 
       {/* ── Nav ── */}
       <nav
         className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 md:px-10 py-4"
-        style={{ background: "rgba(12,26,63,0.92)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(96,165,250,0.1)" }}
+        style={{ background: "rgba(8,15,40,0.9)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(96,165,250,0.12)" }}
       >
-        <div className="flex items-center gap-2.5">
-          <span className="text-blue-400 font-black leading-none" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 26, letterSpacing: "0.03em" }}>DVA</span>
-          <span className="text-white/55 font-light hidden sm:block" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, letterSpacing: "0.28em", textTransform: "uppercase" }}>Contracting</span>
+        <div className="flex items-baseline gap-2.5">
+          <span className="leading-none text-white" style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 25 }}>DVA</span>
+          <span className="hidden lg:block" style={{ fontFamily: SANS, fontWeight: 500, fontSize: 11, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)" }}>Contracting</span>
         </div>
-        <div className="hidden md:flex items-center gap-7">
-          {["Services", "Projects", "About", "Contact"].map((link) => (
-            <a key={link} href={`#${link.toLowerCase()}`} className="text-white/50 hover:text-white transition-colors" style={{ fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 500 }}>
+        <div className="hidden md:flex items-center gap-5 lg:gap-7">
+          {["Gallery", "Services", "Projects", "About", "Contact"].map((link) => (
+            <a key={link} href={`#${link.toLowerCase()}`} className="text-white/65 hover:text-white transition-colors whitespace-nowrap" style={{ fontSize: 11, letterSpacing: "0.09em", textTransform: "uppercase", fontWeight: 500 }}>
               {link}
             </a>
           ))}
-          <a href="#contact" className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 font-bold transition-colors" style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Get a Quote
+          <a href={PHONE_TEL} className="hidden lg:flex items-center gap-2 text-white/90 hover:text-white font-semibold transition-colors whitespace-nowrap" style={{ fontSize: 13, letterSpacing: "0.04em" }}>
+            <Phone size={13} style={{ color: SKY }} /> {PHONE_DISPLAY}
+          </a>
+          <a href="#contact" className="text-white px-5 py-2.5 font-semibold transition-colors whitespace-nowrap" style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", background: BLUE, borderRadius: 3 }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = BLUE_DARK)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = BLUE)}>
+            Free Estimate
           </a>
         </div>
-        <button className="md:hidden text-white/70 hover:text-white transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex md:hidden items-center gap-4">
+          <a href={PHONE_TEL} aria-label={`Call ${PHONE_DISPLAY}`} style={{ color: SKY }}><Phone size={19} /></a>
+          <button aria-label="Menu" className="text-white/75 hover:text-white transition-colors" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </nav>
 
       {/* ── Mobile menu ── */}
       {menuOpen && (
         <div className="fixed inset-0 z-30 flex flex-col items-center justify-center gap-8" style={{ background: "rgba(8,15,40,0.98)" }}>
-          {["Services", "Projects", "About", "Contact"].map((link) => (
-            <a key={link} href={`#${link.toLowerCase()}`} className="text-white font-black uppercase hover:text-blue-400 transition-colors"
-              style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "2.5rem", letterSpacing: "0.06em" }}
+          {["Gallery", "Services", "Projects", "About", "Contact"].map((link) => (
+            <a key={link} href={`#${link.toLowerCase()}`} className="text-white transition-colors"
+              style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "2.4rem" }}
               onClick={() => setMenuOpen(false)}
             >
               {link}
             </a>
           ))}
+          <a href={PHONE_TEL} className="flex items-center gap-3 font-semibold" style={{ fontFamily: SANS, fontSize: "1.1rem", letterSpacing: "0.04em", color: SKY }}>
+            <Phone size={18} /> {PHONE_DISPLAY}
+          </a>
         </div>
       )}
 
-      {/* ── Hero ── */}
+      {/* ── Hero: full-bleed real project photo ── */}
       <section
-        className="relative min-h-screen flex flex-col lg:flex-row items-center justify-center pt-16 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #080F28 0%, #0C1A3F 55%, #0D2060 100%)" }}
+        className="relative min-h-screen flex items-center overflow-hidden"
+        style={{
+          backgroundImage: `url(${asset("projects/living-accent.jpg")})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center 40%",
+        }}
       >
-        {/* Very subtle noise — just a radial vignette for depth */}
+        {/* Scrim: readable text on the left, photo breathes on the right */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 80% 70% at 70% 50%, rgba(37,99,235,0.07) 0%, transparent 70%)" }}
+          style={{ background: "linear-gradient(100deg, rgba(8,15,40,0.86) 0%, rgba(8,15,40,0.62) 42%, rgba(8,15,40,0.18) 75%, rgba(8,15,40,0.3) 100%)" }}
+        />
+        {/* below lg the text sits over the middle of the photo — add an even wash */}
+        <div
+          className="absolute inset-0 lg:hidden pointer-events-none"
+          style={{ background: "rgba(8,15,40,0.48)" }}
+        />
+        <div
+          className="absolute inset-x-0 bottom-0 h-28 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(8,15,40,0.55), transparent)" }}
         />
 
-        {/* Left — Headline */}
-        <div className="relative z-10 w-full lg:w-5/12 px-8 lg:pl-16 lg:pr-6 text-center lg:text-left mb-10 lg:mb-0 pt-8 lg:pt-0">
-          <p
-            className="mb-5 text-blue-400/70"
-            style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: "0.25em", textTransform: "uppercase" }}
-          >
-            Licensed · Bonded · Insured
-          </p>
-
-          <h1
-            className="font-black uppercase leading-none mb-6"
-            style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontSize: "clamp(4rem, 9vw, 7.8rem)",
-              color: "#FFFFFF",
-              letterSpacing: "-0.02em",
-              lineHeight: 0.9,
-            }}
-          >
-            Building
-            <br />
-            <span style={{ color: "#60A5FA" }}>Your</span>
-            <br />
-            Vision
-          </h1>
-
-          <p className="text-white/40 mb-8 max-w-sm mx-auto lg:mx-0" style={{ fontSize: "0.95rem", lineHeight: 1.75, fontWeight: 300 }}>
-            DVA Contracting delivers commercial and residential construction with unmatched precision — foundation to finish.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-            <a
-              href="#contact"
-              className="group flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 font-bold uppercase transition-all duration-300"
-              style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.05rem", letterSpacing: "0.1em" }}
+        {/* Headline */}
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-8 lg:px-16 pt-20">
+          <div className="max-w-xl text-center lg:text-left mx-auto lg:mx-0">
+            <p
+              className="mb-6"
+              style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.25em", textTransform: "uppercase", color: SKY_SOFT }}
             >
-              Free Estimate
-              <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
-            </a>
-            <a
-              href="#projects"
-              className="flex items-center justify-center gap-2.5 text-white/60 hover:text-white border hover:border-white/40 px-8 py-4 font-semibold uppercase transition-all duration-300"
-              style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.05rem", letterSpacing: "0.1em", borderColor: "rgba(96,165,250,0.25)" }}
-            >
-              View Work
-            </a>
-          </div>
-        </div>
+              Owner-Led · Bartlett, Illinois
+            </p>
 
-        {/* Right — 3D Sphere */}
-        <div className="relative z-10 w-full lg:w-7/12 flex items-center justify-center py-8 lg:py-0">
-          <div style={{ transform: `scale(min(1, calc((min(100vw, 560px) - 2rem) / 520px)))`, transformOrigin: "center center" }}>
-            <Sphere3D onSelect={openProject} />
+            <h1
+              className="mb-7 text-white"
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 500,
+                fontSize: "clamp(3.2rem, 6.5vw, 5.4rem)",
+                letterSpacing: "-0.015em",
+                lineHeight: 1.04,
+              }}
+            >
+              Building
+              <br />
+              <em style={{ fontStyle: "italic", fontWeight: 400, color: SKY_SOFT }}>your vision.</em>
+            </h1>
+
+            <p className="mb-9 max-w-md mx-auto lg:mx-0" style={{ fontSize: "1rem", lineHeight: 1.75, fontWeight: 300, color: "rgba(255,255,255,0.78)" }}>
+              Kitchens, bathrooms, basements, additions, and new builds. DVA Contracting is Dave Amaro's crew: over fifteen years of residential and commercial work, from the first walkthrough to the final punch list.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              <a
+                href="#contact"
+                className="group flex items-center justify-center gap-2.5 text-white px-8 py-4 font-semibold uppercase transition-all duration-300"
+                style={{ fontFamily: SANS, fontSize: "0.85rem", letterSpacing: "0.1em", background: BLUE, borderRadius: 3 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = BLUE_DARK)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = BLUE)}
+              >
+                Free Estimate
+                <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+              </a>
+              <a
+                href="#gallery"
+                className="flex items-center justify-center gap-2.5 text-white/85 hover:text-white px-8 py-4 font-semibold uppercase transition-all duration-300"
+                style={{ fontFamily: SANS, fontSize: "0.85rem", letterSpacing: "0.1em", border: "1px solid rgba(255,255,255,0.35)", borderRadius: 3 }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.8)")}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)")}
+              >
+                View Work
+              </a>
+            </div>
+
+            <p className="mt-8" style={{ fontFamily: SANS, fontSize: 11, letterSpacing: "0.08em", color: "rgba(255,255,255,0.55)" }}>
+              Pictured: a DVA living room remodel.
+            </p>
           </div>
         </div>
 
         {/* Scroll cue */}
-        <a href="#stats" className="absolute bottom-7 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-colors" style={{ color: "rgba(148,163,184,0.3)" }}>
-          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase" }}>Scroll</span>
+        <a href="#gallery" className="absolute bottom-7 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 transition-colors" style={{ color: "rgba(255,255,255,0.55)" }}>
+          <span style={{ fontFamily: SANS, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase" }}>Scroll</span>
           <ChevronDown size={14} className="animate-bounce" />
         </a>
       </section>
 
-      {/* ── Stats ── */}
-      <section id="stats" className="py-14 bg-white border-b" style={{ borderColor: "rgba(37,99,235,0.1)" }}>
-        <div className="max-w-5xl mx-auto px-8 grid grid-cols-2 lg:grid-cols-4 gap-10">
-          {STATS.map((s, i) => (
-            <div key={s.label} className="text-center relative">
-              {i > 0 && (
-                <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-10 w-px" style={{ background: "rgba(37,99,235,0.12)" }} />
-              )}
-              <div className="font-black leading-none mb-1.5" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2.4rem,5vw,3.5rem)", color: "#1D4ED8" }}>
-                {s.value}
-              </div>
-              <div className="text-slate-500" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500 }}>
-                {s.label}
-              </div>
-            </div>
-          ))}
+      {/* ── Gallery: the spinning sphere alone on one screen, stats anchoring it ── */}
+      <section
+        id="gallery"
+        className="lg:h-screen flex flex-col justify-between px-8 pt-20 pb-8"
+        style={{ background: "#FFFFFF", borderBottom: `1px solid ${LINE}`, scrollMarginTop: 0 }}
+      >
+        <Reveal>
+          <div className="text-center">
+            <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
+              The Portfolio, In Motion
+            </p>
+            <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2rem,3.6vw,2.9rem)", color: INK, lineHeight: 1.05 }}>
+              Take a spin through <em style={{ fontStyle: "italic", fontWeight: 400, color: BLUE }}>the work.</em>
+            </h2>
+          </div>
+        </Reveal>
+
+        <div className="flex-1 flex items-center justify-center py-4">
+          {/* scales down by width AND by available height so the whole section fits one screen */}
+          <div style={{ transform: `scale(min(1, calc((min(100vw, 560px) - 2rem) / 520px), calc((100vh - 430px) / 480)))`, transformOrigin: "center center" }}>
+            <Sphere3D onSelect={openProject} />
+          </div>
+        </div>
+
+        <div className="max-w-5xl mx-auto w-full pt-8" style={{ borderTop: `1px solid ${LINE}` }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {STATS.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.07}>
+                <div className="text-center relative">
+                  {i > 0 && (
+                    <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 h-10 w-px" style={{ background: LINE }} />
+                  )}
+                  <div className="leading-none mb-2" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.8rem,3.2vw,2.5rem)", color: BLUE_DARK }}>
+                    {s.value}
+                  </div>
+                  <div style={{ fontFamily: SANS, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: INK2 }}>
+                    {s.label}
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Services ── */}
-      <section id="services" className="py-24 px-8 bg-white">
+      <section id="services" className="py-24 px-8" style={{ background: "#FFFFFF", scrollMarginTop: 70 }}>
         <div className="max-w-6xl mx-auto">
-          <div className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <p className="text-blue-600 mb-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-                What We Do
+          <Reveal>
+            <div className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div>
+                <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
+                  What We Do
+                </p>
+                <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2.2rem,4.5vw,3.4rem)", color: INK, lineHeight: 1.05 }}>
+                  Our services
+                </h2>
+              </div>
+              <p className="max-w-xs text-sm leading-relaxed" style={{ fontWeight: 400, color: INK3 }}>
+                Every photo on this page is a DVA job. Hover a card to see what's included.
               </p>
-              <h2 className="font-black uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2.5rem,5vw,4rem)", color: "#0C1A3F", lineHeight: 0.95 }}>
-                Our Services
-              </h2>
             </div>
-            <p className="text-slate-400 max-w-xs text-sm leading-relaxed" style={{ fontWeight: 300 }}>
-              Hover each service to explore — or reach out to discuss your project scope.
-            </p>
-          </div>
+          </Reveal>
 
           <div className="grid md:grid-cols-3 gap-5">
             {SERVICES.map((s, idx) => (
-              <ServiceCard key={s.num} s={s} idx={idx} />
+              <Reveal key={s.num} delay={idx * 0.08}>
+                <ServiceCard s={s} />
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── Projects grid ── */}
-      <section id="projects" className="py-24" style={{ background: "#F0F4FF" }}>
+      <section id="projects" className="py-24" style={{ background: STONE, scrollMarginTop: 70 }}>
         <div className="max-w-6xl mx-auto px-8">
-          <div className="flex items-end justify-between mb-14">
-            <div>
-              <p className="text-blue-600 mb-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-                Portfolio
+          <Reveal>
+            <div className="flex items-end justify-between mb-14">
+              <div>
+                <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
+                  Portfolio
+                </p>
+                <h2 style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2.2rem,4.5vw,3.4rem)", color: INK, lineHeight: 1.05 }}>
+                  Real projects
+                </h2>
+              </div>
+              <p className="hidden md:block max-w-xs text-sm leading-relaxed text-right" style={{ fontWeight: 400, color: INK3 }}>
+                Kitchens, baths, basements, decks, and builds. Click any photo to view it full size.
               </p>
-              <h2 className="font-black uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2.5rem,5vw,4rem)", color: "#0C1A3F", lineHeight: 0.95 }}>
-                Recent Projects
-              </h2>
             </div>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          </Reveal>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {PROJECTS.map((p, i) => (
               <div
                 key={p.id}
                 className="group relative overflow-hidden cursor-pointer"
-                style={{ aspectRatio: i === 0 || i === 5 ? "1/1.3" : "1/1", background: "#CBD5E1", borderRadius: 3 }}
+                style={{ aspectRatio: i === 0 || i === 5 ? "1/1.3" : "1/1", background: "#DCE4F5", borderRadius: 4 }}
                 onClick={() => setSelectedIdx(i)}
               >
-                <img src={p.thumb} alt={p.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={p.thumb} alt={p.label} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
                   style={{ background: "linear-gradient(to top, rgba(8,15,50,0.88) 0%, rgba(8,15,50,0.1) 60%, transparent 100%)" }}
                 >
-                  <p className="text-blue-300" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>{p.category}</p>
-                  <p className="text-white font-bold uppercase" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1.1rem" }}>{p.label}</p>
+                  <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: SKY_SOFT }}>{p.category}</p>
+                  <p className="text-white" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.05rem" }}>{p.label}</p>
                 </div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ border: "1.5px solid rgba(96,165,250,0.5)", borderRadius: 3 }} />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ border: "1.5px solid rgba(96,165,250,0.55)", borderRadius: 4 }} />
               </div>
             ))}
           </div>
@@ -723,121 +902,140 @@ export default function App() {
       </section>
 
       {/* ── About ── */}
-      <section id="about" className="py-24 px-8 bg-white border-t" style={{ borderColor: "rgba(37,99,235,0.08)" }}>
+      <section id="about" className="py-24 px-8" style={{ background: "#FFFFFF", borderTop: `1px solid ${LINE}`, scrollMarginTop: 70 }}>
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-          <div>
-            <p className="text-blue-600 mb-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-              About DVA
-            </p>
-            <h2 className="font-black uppercase mb-6" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2.5rem,5vw,4rem)", color: "#0C1A3F", lineHeight: 0.95 }}>
-              Built on Trust,<br />
-              <span style={{ color: "#2563EB" }}>Delivered with Pride</span>
-            </h2>
-            <p className="text-slate-500 mb-4 leading-relaxed text-sm" style={{ fontWeight: 300 }}>
-              Since 2002, DVA Contracting has been the partner of choice for developers, property owners, and municipalities. We combine trade expertise with rigorous project management to deliver results that stand for generations.
-            </p>
-            <p className="text-slate-500 leading-relaxed text-sm mb-8" style={{ fontWeight: 300 }}>
-              Our crews are fully licensed, bonded, and insured. We self-perform the critical path and manage specialty subcontractors with the same accountability we hold ourselves to.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {["Licensed GC — Class A", "OSHA 30 Certified", "Bonded & Insured", "MBE Certified"].map((badge) => (
-                <span key={badge} className="px-3 py-1.5 text-blue-700 text-xs font-medium" style={{ background: "#EFF6FF", border: "1px solid rgba(37,99,235,0.18)", letterSpacing: "0.05em" }}>
-                  {badge}
-                </span>
-              ))}
+          <Reveal>
+            <div>
+              <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: BLUE }}>
+                About DVA
+              </p>
+              <h2 className="mb-6" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2.2rem,4.5vw,3.4rem)", color: INK, lineHeight: 1.08 }}>
+                Building trust,<br />
+                <em style={{ fontStyle: "italic", fontWeight: 400, color: BLUE }}>crafting excellence.</em>
+              </h2>
+              <p className="mb-4 leading-relaxed text-[15px]" style={{ fontWeight: 400, color: INK2 }}>
+                DVA Contracting is run by Dave Amaro, and it has been for more than fifteen years. Kitchens, bathrooms, basements, additions, decks, and ground-up builds, residential and commercial. Based in Bartlett and serving anywhere within about two hours of it.
+              </p>
+              <p className="leading-relaxed text-[15px] mb-8" style={{ fontWeight: 400, color: INK2 }}>
+                You deal with Dave from the first walkthrough to the final punch list. He gives you a straight price, keeps you in the loop while the work happens, and stands behind it after the last truck leaves.
+              </p>
+              {/* [VERIFY with Dave: exact licensed/bonded/insured wording + license number before adding a badge for it] */}
+              <div className="flex flex-wrap gap-3">
+                {["Residential & Commercial", "Free Estimates", "Based in Bartlett, IL", "15+ Years in Business"].map((badge) => (
+                  <span key={badge} className="px-3 py-1.5 text-xs font-medium" style={{ background: "#EFF6FF", border: "1px solid rgba(37,99,235,0.2)", color: BLUE_DARK, letterSpacing: "0.05em", borderRadius: 3 }}>
+                    {badge}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="relative overflow-hidden" style={{ aspectRatio: "4/3", background: "#CBD5E1", borderRadius: 3 }}>
-            <img src="https://images.unsplash.com/photo-1694521787799-ad4ad241cb39?w=800&h=600&fit=crop&auto=format" alt="DVA Contracting team" className="w-full h-full object-cover" />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.12) 0%, transparent 60%)" }} />
-          </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="relative overflow-hidden" style={{ aspectRatio: "4/3", background: "#DCE4F5", borderRadius: 5, boxShadow: "0 30px 60px -30px rgba(12,26,63,0.35)" }}>
+              <img src={asset("projects/framing-aerial.jpg")} alt="DVA Contracting crew framing a roof" className="w-full h-full object-cover" />
+              <p className="absolute bottom-3 left-4 text-white/95" style={{ fontFamily: SANS, fontSize: 11, letterSpacing: "0.08em", textShadow: "0 1px 8px rgba(0,0,0,.6)" }}>
+                The crew, setting trusses
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ── Contact ── */}
-      <section id="contact" className="py-24 px-8" style={{ background: "#0C1A3F" }}>
+      <section id="contact" className="py-24 px-8" style={{ background: DARK, scrollMarginTop: 70 }}>
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <p className="text-blue-400 mb-3" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-              Work With Us
-            </p>
-            <h2 className="font-black uppercase mb-4" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "clamp(2.5rem,5vw,4rem)", color: "#FFFFFF", lineHeight: 0.95 }}>
-              Start Your Project
-            </h2>
-            <p className="text-white/35 max-w-lg mx-auto text-sm leading-relaxed" style={{ fontWeight: 300 }}>
-              Tell us about your project and we'll respond within 24 hours with a preliminary assessment.
-            </p>
-          </div>
+          <Reveal>
+            <div className="text-center mb-14">
+              <p className="mb-3" style={{ fontFamily: SANS, fontSize: 11, fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: SKY }}>
+                Work With Us
+              </p>
+              <h2 className="mb-4 text-white" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(2.2rem,4.5vw,3.4rem)", lineHeight: 1.05 }}>
+                Start your project
+              </h2>
+              <p className="max-w-lg mx-auto text-sm leading-relaxed" style={{ fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>
+                Tell us what you're planning. Dave will call you back to talk through scope, budget, and timing. No pressure, no obligation.
+              </p>
+            </div>
+          </Reveal>
 
           <div className="grid md:grid-cols-5 gap-12 md:gap-16">
             <div className="md:col-span-2 space-y-6">
               {[
-                { icon: <Phone size={15} />, label: "Call Us",  value: "(555) 842-3900" },
-                { icon: <Mail  size={15} />, label: "Email",    value: "projects@dvacontracting.com" },
-                { icon: <MapPin size={15}/>, label: "Office",   value: "1200 Industrial Blvd, Suite 400" },
+                { icon: <Phone size={15} />,  label: "Call Dave", value: PHONE_DISPLAY, href: PHONE_TEL },
+                { icon: <Mail  size={15} />,  label: "Email",     value: EMAIL, href: `mailto:${EMAIL}` },
+                { icon: <MapPin size={15}/>,  label: "Service Area", value: "Bartlett, IL, and about 2 hours in every direction" },
               ].map((c) => (
                 <div key={c.label} className="flex items-start gap-4">
-                  <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(96,165,250,0.12)", color: "#60A5FA", border: "1px solid rgba(96,165,250,0.2)" }}>
+                  <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center" style={{ background: "rgba(96,165,250,0.12)", color: SKY, border: "1px solid rgba(96,165,250,0.25)", borderRadius: 3 }}>
                     {c.icon}
                   </div>
                   <div>
-                    <p className="text-blue-400/50 mb-0.5" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase" }}>{c.label}</p>
-                    <p className="text-white/75 text-sm">{c.value}</p>
+                    <p className="mb-0.5" style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(147,197,253,0.65)" }}>{c.label}</p>
+                    {c.href
+                      ? <a href={c.href} className="text-white/85 hover:text-white text-sm transition-colors">{c.value}</a>
+                      : <p className="text-white/85 text-sm">{c.value}</p>}
                   </div>
                 </div>
               ))}
-              <div className="pt-5 border-t" style={{ borderColor: "rgba(96,165,250,0.1)" }}>
-                <p className="text-white/20 text-xs leading-relaxed" style={{ fontWeight: 300 }}>
-                  Mon–Fri 7:00am–5:30pm<br />Emergency line available 24/7
+              <div className="pt-5" style={{ borderTop: "1px solid rgba(96,165,250,0.15)" }}>
+                <p className="text-xs leading-relaxed" style={{ fontWeight: 300, color: "rgba(255,255,255,0.45)" }}>
+                  Family run. You'll get a call back from the owner, not a call center.
                 </p>
               </div>
             </div>
 
-            <form className="md:col-span-3 space-y-3" onSubmit={(e) => e.preventDefault()}>
+            <form className="md:col-span-3 space-y-3" onSubmit={submitForm}>
               <div className="grid sm:grid-cols-2 gap-3">
-                {["Full Name", "Company"].map((f) => (
-                  <input key={f} type="text" placeholder={f}
-                    className="w-full px-4 py-3 text-white placeholder-white/25 text-sm outline-none transition-all"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(96,165,250,0.15)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.55)")}
-                    onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.15)")}
-                  />
-                ))}
-              </div>
-              {["Email Address", "Phone Number"].map((f) => (
-                <input key={f} type="text" placeholder={f}
-                  className="w-full px-4 py-3 text-white placeholder-white/25 text-sm outline-none transition-all"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(96,165,250,0.15)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.55)")}
-                  onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.15)")}
+                <input name="name" type="text" placeholder="Full Name" required
+                  className="w-full px-4 py-3 text-white placeholder-white/40 text-sm outline-none transition-all"
+                  style={inputStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.6)")}
+                  onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.2)")}
                 />
-              ))}
-              <textarea placeholder="Describe your project — scope, location, timeline..." rows={4}
-                className="w-full px-4 py-3 text-white placeholder-white/25 text-sm outline-none transition-all resize-none"
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(96,165,250,0.15)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.55)")}
-                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.15)")}
+                <input name="phone" type="tel" placeholder="Phone Number"
+                  className="w-full px-4 py-3 text-white placeholder-white/40 text-sm outline-none transition-all"
+                  style={inputStyle}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.6)")}
+                  onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.2)")}
+                />
+              </div>
+              <input name="email" type="email" placeholder="Email Address"
+                className="w-full px-4 py-3 text-white placeholder-white/40 text-sm outline-none transition-all"
+                style={inputStyle}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.6)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.2)")}
+              />
+              <textarea name="message" placeholder="Describe your project: what, where, and roughly when" rows={4} required
+                className="w-full px-4 py-3 text-white placeholder-white/40 text-sm outline-none transition-all resize-none"
+                style={inputStyle}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.6)")}
+                onBlur={(e)  => (e.currentTarget.style.borderColor = "rgba(96,165,250,0.2)")}
               />
               <button type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white py-4 font-bold uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 group"
-                style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1rem", letterSpacing: "0.12em" }}
+                className="w-full text-white py-4 font-semibold uppercase transition-all duration-300 flex items-center justify-center gap-2.5 group"
+                style={{ fontFamily: SANS, fontSize: "0.85rem", letterSpacing: "0.12em", background: BLUE, borderRadius: 3 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = BLUE_DARK)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = BLUE)}
               >
                 Send Message <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
               </button>
+              <p className="text-xs text-center pt-1" style={{ fontWeight: 300, color: "rgba(255,255,255,0.4)" }}>
+                Opens your email app with everything filled in. Prefer to talk? <a href={PHONE_TEL} style={{ color: SKY_SOFT }}>Call {PHONE_DISPLAY}</a>.
+              </p>
             </form>
           </div>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="py-8 px-8 border-t" style={{ background: "#080F28", borderColor: "rgba(96,165,250,0.08)" }}>
+      <footer className="py-8 px-8" style={{ background: DARKER, borderTop: "1px solid rgba(96,165,250,0.1)" }}>
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <span className="text-blue-400 font-black" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 22 }}>DVA</span>
-            <span className="text-white/30 font-light" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase" }}>Contracting</span>
+          <div className="flex items-baseline gap-2.5">
+            <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 22, color: SKY }}>DVA</span>
+            <span style={{ fontFamily: SANS, fontWeight: 400, fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Contracting</span>
           </div>
-          <p className="text-white/18 text-xs text-center" style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 300, color: "rgba(255,255,255,0.2)" }}>
-            © 2024 DVA Contracting. All rights reserved. · Licensed Contractor #C-38291
+          {/* [VERIFY with Dave: add real IL license number here if he wants it public] */}
+          <p className="text-xs text-center" style={{ fontFamily: SANS, fontWeight: 300, color: "rgba(255,255,255,0.4)" }}>
+            © 2026 DVA Contracting, Inc. All rights reserved. · Bartlett, Illinois · <a href={PHONE_TEL} className="hover:text-white/70 transition-colors">{PHONE_DISPLAY}</a>
           </p>
         </div>
       </footer>
