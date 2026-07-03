@@ -878,34 +878,69 @@ export default function App() {
               </p>
             </div>
           </Reveal>
-          {/* Interlocking mosaic: three 2x2 feature tiles + 1x1 squares tile a perfect 4x6 rectangle */}
-          <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense gap-2.5">
-            {PROJECTS.map((p, i) => {
+          {/* Interlocking mosaic: three 2x2 feature tiles + two 2x1 note tiles + 1x1 squares
+              tile a perfect 4x7 rectangle. Images are absolutely positioned so tile intrinsic
+              size never inflates rows (that's what caused the white gaps). */}
+          {(() => {
+            const tile = (p: Project, i: number) => {
               const featured = i === 0 || i === 5 || i === 10;
               return (
-              <div
-                key={p.id}
-                className={`group relative overflow-hidden cursor-pointer ${
-                  featured ? "md:col-span-2 md:row-span-2" : ""
-                } ${i === 5 ? "md:col-start-3" : ""} ${
-                  i === 0 ? "col-span-2 aspect-[16/10] md:aspect-auto" : featured ? "aspect-square md:aspect-auto" : "aspect-square"
-                }`}
-                style={{ background: "#DCE4F5", borderRadius: 4 }}
-                onClick={() => setSelectedIdx(i)}
-              >
-                <img src={featured ? p.full : p.thumb} alt={p.label} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
-                  style={{ background: "linear-gradient(to top, rgba(8,15,50,0.88) 0%, rgba(8,15,50,0.1) 60%, transparent 100%)" }}
+                  key={p.id}
+                  className={`group relative overflow-hidden cursor-pointer ${
+                    featured ? "md:col-span-2 md:row-span-2" : ""
+                  } ${i === 5 ? "md:col-start-3" : ""} ${
+                    i === 0 ? "col-span-2 aspect-[16/10] md:aspect-auto" : featured ? "aspect-square md:aspect-auto" : "aspect-square"
+                  }`}
+                  style={{ background: "#DCE4F5", borderRadius: 4 }}
+                  onClick={() => setSelectedIdx(i)}
                 >
-                  <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: SKY_SOFT }}>{p.category}</p>
-                  <p className="text-white" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.05rem" }}>{p.label}</p>
+                  <img src={featured ? p.full : p.thumb} alt={p.label} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4"
+                    style={{ background: "linear-gradient(to top, rgba(8,15,50,0.88) 0%, rgba(8,15,50,0.1) 60%, transparent 100%)" }}
+                  >
+                    <p style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: SKY_SOFT }}>{p.category}</p>
+                    <p className="text-white" style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "1.05rem" }}>{p.label}</p>
+                  </div>
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ border: "1.5px solid rgba(96,165,250,0.55)", borderRadius: 4 }} />
                 </div>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ border: "1.5px solid rgba(96,165,250,0.55)", borderRadius: 4 }} />
-              </div>
               );
-            })}
-          </div>
+            };
+            return (
+              <div className="grid grid-cols-2 md:grid-cols-4 grid-flow-dense gap-2.5">
+                {PROJECTS.slice(0, 5).map((p, k) => tile(p, k))}
+
+                {/* Note tile — sits beside the second feature tile */}
+                <div className="col-span-2 flex flex-col justify-center p-7 lg:p-9" style={{ background: DARK, borderRadius: 4 }}>
+                  <p className="mb-2.5" style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: SKY_SOFT }}>
+                    No Stock Photos
+                  </p>
+                  <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.1rem,1.5vw,1.4rem)", color: "#FFFFFF", lineHeight: 1.4 }}>
+                    Every photo in this grid is a real DVA job — <em style={{ fontStyle: "italic", fontWeight: 400, color: SKY_SOFT }}>shot on site, not staged.</em>
+                  </p>
+                </div>
+
+                {PROJECTS.slice(5, 10).map((p, k) => tile(p, k + 5))}
+
+                {/* Note tile — quiet CTA in the lower half of the mosaic */}
+                <div className="col-span-2 flex flex-col justify-center p-7 lg:p-9" style={{ background: "#FFFFFF", border: `1px solid ${LINE}`, borderRadius: 4 }}>
+                  <p className="mb-2.5" style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: BLUE }}>
+                    Your Project Next?
+                  </p>
+                  <p style={{ fontFamily: SERIF, fontWeight: 500, fontSize: "clamp(1.1rem,1.5vw,1.4rem)", color: INK, lineHeight: 1.4 }}>
+                    Estimates are free — call{" "}
+                    <a href={PHONE_TEL} className="whitespace-nowrap hover:underline" style={{ color: BLUE, fontStyle: "italic", fontWeight: 400 }}>
+                      630-886-8628
+                    </a>{" "}
+                    and talk to Dave directly.
+                  </p>
+                </div>
+
+                {PROJECTS.slice(10).map((p, k) => tile(p, k + 10))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
