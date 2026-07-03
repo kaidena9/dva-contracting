@@ -73,7 +73,7 @@ const SERVICES = [
     num: "01",
     title: "Kitchens & Bathrooms",
     tagline: "The rooms that sell homes",
-    desc: "Full gut renovations: cabinetry, tile, counters, plumbing, and lighting. Designed with you, built by crews Dave trusts, and finished to the punch list.",
+    desc: "Full gut renovations: cabinetry, tile, counters, plumbing, and lighting. Designed with you, built by crews David trusts, and finished to the punch list.",
     img: asset("projects/kitchen-coffered.jpg"),
   },
   {
@@ -92,7 +92,7 @@ const SERVICES = [
   },
 ];
 
-/* Honest numbers only. [VERIFY with Dave: free estimates offered? licensed/insured wording] */
+/* Honest numbers only. [VERIFY with David: free estimates offered? licensed/insured wording] */
 const STATS = [
   { value: "15+",   label: "Years in Business" },
   { value: "1",     label: "Owner on Every Job" },
@@ -748,7 +748,7 @@ export default function App() {
             </h1>
 
             <p className="mb-9 max-w-md mx-auto lg:mx-0" style={{ fontSize: "1rem", lineHeight: 1.75, fontWeight: 300, color: "rgba(255,255,255,0.78)" }}>
-              Kitchens, bathrooms, basements, additions, and new builds. DVA Contracting is Dave Amaro's crew: over fifteen years of residential and commercial work, from the first walkthrough to the final punch list.
+              Kitchens, bathrooms, basements, additions, and new builds. DVA Contracting is David Amaro's crew: over fifteen years of residential and commercial work, from the first walkthrough to the final punch list.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
@@ -933,7 +933,7 @@ export default function App() {
                     <a href={PHONE_TEL} className="whitespace-nowrap hover:underline" style={{ color: BLUE, fontStyle: "italic", fontWeight: 400 }}>
                       630-886-8628
                     </a>{" "}
-                    and talk to Dave directly.
+                    and talk to David directly.
                   </p>
                 </div>
 
@@ -957,12 +957,12 @@ export default function App() {
                 <em style={{ fontStyle: "italic", fontWeight: 400, color: BLUE }}>crafting excellence.</em>
               </h2>
               <p className="mb-4 leading-relaxed text-[15px]" style={{ fontWeight: 400, color: INK2 }}>
-                DVA Contracting is run by Dave Amaro, and it has been for more than fifteen years. Kitchens, bathrooms, basements, additions, decks, and ground-up builds, residential and commercial. Based in Bartlett and serving anywhere within about two hours of it.
+                DVA Contracting is run by David Amaro, and it has been for more than fifteen years. Kitchens, bathrooms, basements, additions, decks, and ground-up builds, residential and commercial. Based in Bartlett and serving anywhere within about two hours of it.
               </p>
               <p className="leading-relaxed text-[15px] mb-8" style={{ fontWeight: 400, color: INK2 }}>
-                You deal with Dave from the first walkthrough to the final punch list. He gives you a straight price, keeps you in the loop while the work happens, and stands behind it after the last truck leaves.
+                You deal with David from the first walkthrough to the final punch list. He gives you a straight price, keeps you in the loop while the work happens, and stands behind it after the last truck leaves.
               </p>
-              {/* [VERIFY with Dave: exact licensed/bonded/insured wording + license number before adding a badge for it] */}
+              {/* [VERIFY with David: exact licensed/bonded/insured wording + license number before adding a badge for it] */}
               <div className="flex flex-wrap gap-3">
                 {["Residential & Commercial", "Free Estimates", "Based in Bartlett, IL", "15+ Years in Business"].map((badge) => (
                   <span key={badge} className="px-3 py-1.5 text-xs font-medium" style={{ background: "#EFF6FF", border: "1px solid rgba(37,99,235,0.2)", color: BLUE_DARK, letterSpacing: "0.05em", borderRadius: 3 }}>
@@ -995,7 +995,7 @@ export default function App() {
                 Start your project
               </h2>
               <p className="max-w-lg mx-auto text-sm leading-relaxed" style={{ fontWeight: 300, color: "rgba(255,255,255,0.6)" }}>
-                Tell us what you're planning. Dave will call you back to talk through scope, budget, and timing. No pressure, no obligation.
+                Tell us what you're planning. David will call you back to talk through scope, budget, and timing. No pressure, no obligation.
               </p>
             </div>
           </Reveal>
@@ -1003,7 +1003,7 @@ export default function App() {
           <div className="grid md:grid-cols-5 gap-12 md:gap-16">
             <div className="md:col-span-2 space-y-6">
               {[
-                { icon: <Phone size={15} />,  label: "Call Dave", value: PHONE_DISPLAY, href: PHONE_TEL },
+                { icon: <Phone size={15} />,  label: "Call David", value: PHONE_DISPLAY, href: PHONE_TEL },
                 { icon: <Mail  size={15} />,  label: "Email",     value: EMAIL, href: `mailto:${EMAIL}` },
                 { icon: <MapPin size={15}/>,  label: "Service Area", value: "Bartlett, IL, and about 2 hours in every direction" },
               ].map((c) => (
@@ -1076,7 +1076,7 @@ export default function App() {
             <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 22, color: SKY }}>DVA</span>
             <span style={{ fontFamily: SANS, fontWeight: 400, fontSize: 11, letterSpacing: "0.25em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>Contracting</span>
           </div>
-          {/* [VERIFY with Dave: add real IL license number here if he wants it public] */}
+          {/* [VERIFY with David: add real IL license number here if he wants it public] */}
           <p className="text-xs text-center" style={{ fontFamily: SANS, fontWeight: 300, color: "rgba(255,255,255,0.4)" }}>
             © 2026 DVA Contracting, Inc. All rights reserved. · Bartlett, Illinois · <a href={PHONE_TEL} className="hover:text-white/70 transition-colors">{PHONE_DISPLAY}</a>
           </p>
